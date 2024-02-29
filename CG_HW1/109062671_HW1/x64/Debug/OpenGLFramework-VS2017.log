@@ -1,0 +1,26 @@
+﻿  main.cpp
+c:\users\peter wu\source\repos\hw1_vs2017_framework\openglframework-vs2017\main.cpp(297): warning C4305: 'initializing': truncation from 'double' to 'GLfloat'
+c:\users\peter wu\source\repos\hw1_vs2017_framework\openglframework-vs2017\main.cpp(304): warning C4305: 'initializing': truncation from 'double' to 'GLfloat'
+c:\users\peter wu\source\repos\hw1_vs2017_framework\openglframework-vs2017\main.cpp(508): warning C4244: '+=': conversion from 'double' to 'float', possible loss of data
+c:\users\peter wu\source\repos\hw1_vs2017_framework\openglframework-vs2017\main.cpp(513): warning C4244: '+=': conversion from 'double' to 'float', possible loss of data
+c:\users\peter wu\source\repos\hw1_vs2017_framework\openglframework-vs2017\main.cpp(518): warning C4244: '+=': conversion from 'double' to 'float', possible loss of data
+c:\users\peter wu\source\repos\hw1_vs2017_framework\openglframework-vs2017\main.cpp(600): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\users\peter wu\source\repos\hw1_vs2017_framework\openglframework-vs2017\main.cpp(601): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\users\peter wu\source\repos\hw1_vs2017_framework\openglframework-vs2017\main.cpp(633): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\users\peter wu\source\repos\hw1_vs2017_framework\openglframework-vs2017\main.cpp(634): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\users\peter wu\source\repos\hw1_vs2017_framework\openglframework-vs2017\main.cpp(666): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\users\peter wu\source\repos\hw1_vs2017_framework\openglframework-vs2017\main.cpp(667): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\users\peter wu\source\repos\hw1_vs2017_framework\openglframework-vs2017\main.cpp(699): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\users\peter wu\source\repos\hw1_vs2017_framework\openglframework-vs2017\main.cpp(700): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\users\peter wu\source\repos\hw1_vs2017_framework\openglframework-vs2017\main.cpp(734): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\users\peter wu\source\repos\hw1_vs2017_framework\openglframework-vs2017\main.cpp(735): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\users\peter wu\source\repos\hw1_vs2017_framework\openglframework-vs2017\main.cpp(768): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\users\peter wu\source\repos\hw1_vs2017_framework\openglframework-vs2017\main.cpp(769): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\users\peter wu\source\repos\hw1_vs2017_framework\openglframework-vs2017\main.cpp(989): warning C4477: 'printf' : format string '%d' requires an argument of type 'int', but variadic argument 1 has type 'unsigned __int64'
+  c:\users\peter wu\source\repos\hw1_vs2017_framework\openglframework-vs2017\main.cpp(989): note: consider using '%zd' in the format string
+c:\users\peter wu\source\repos\hw1_vs2017_framework\openglframework-vs2017\main.cpp(989): warning C4477: 'printf' : format string '%d' requires an argument of type 'int', but variadic argument 2 has type 'unsigned __int64'
+  c:\users\peter wu\source\repos\hw1_vs2017_framework\openglframework-vs2017\main.cpp(989): note: consider using '%zd' in the format string
+c:\users\peter wu\source\repos\hw1_vs2017_framework\openglframework-vs2017\main.cpp(1001): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+c:\users\peter wu\source\repos\hw1_vs2017_framework\openglframework-vs2017\main.cpp(1027): warning C4305: '=': truncation from 'double' to 'GLfloat'
+c:\users\peter wu\source\repos\hw1_vs2017_framework\openglframework-vs2017\main.cpp(1047): warning C4305: 'argument': truncation from 'double' to 'GLfloat'
+  OpenGLFramework-VS2017.vcxproj -> C:\Users\Peter Wu\source\repos\HW1_VS2017_Framework\x64\Debug\OpenGLFramework-VS2017.exe
