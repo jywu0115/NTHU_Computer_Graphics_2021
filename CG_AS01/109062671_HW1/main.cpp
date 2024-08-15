@@ -382,22 +382,22 @@ void RenderScene(void) {
 	mvp[3] = 0;  mvp[7] = 0;   mvp[11] = 0;   mvp[15] = 1;
 
 	// use uniform to send mvp to vertex shader
-	for (int i = 0; i < 16; i++)
-		mvp[i] = MVP[i];
+	for (int i = 0; i < 16; i++) mvp[i] = MVP[i];
 	
 	// [TODO] draw 3D model in solid or in wireframe mode here, and draw plane
-	if (isDrawWireframe == false) // draw 3D model in solid mode
+	if (isDrawWireframe == false) {// draw 3D model in solid mode
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	else // draw 3D model wireframe mode
+	} else {// draw 3D model wireframe mode
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
+	}
 	glUniformMatrix4fv(iLocMVP, 1, GL_FALSE, mvp);
 	glBindVertexArray(m_shape_list[cur_idx].vao); // tie vao
 	glDrawArrays(GL_TRIANGLES, 0, m_shape_list[cur_idx].vertex_count);	
 	glBindVertexArray(0);
 
-	if (isDrawWireframe == true) // draw plane in solid mode
+	if (isDrawWireframe == true){ // draw plane in solid mode
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	}
 	drawPlane();
 }
 
@@ -506,46 +506,35 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 		// if scroll up, then object will be more close.
 		// if scroll down, then object will be farther.
 		models[cur_idx].position.z += yoffset * 0.1f;
-	}
-	else if (cur_trans_mode == GeoRotation) { // rotation mode
+	} else if (cur_trans_mode == GeoRotation) { // rotation mode
 		// if scroll up, then object will counterclockwise.
 		// if scroll down, then object will clockwise.
 		models[cur_idx].rotation.z += yoffset * 0.1f;
-	}
-	else if (cur_trans_mode == GeoScaling){ // Scaling mode
+	} else if (cur_trans_mode == GeoScaling){ // Scaling mode
 		// if scroll up, then object will be bigger.
 		// if scroll down, then object will be smaller.		
 		models[cur_idx].scale.z += yoffset * 0.01f;
-		if (models[cur_idx].scale.z <= 0)
-			models[cur_idx].scale.z = 0;
-	} 
-	else if (cur_trans_mode == ViewEye) { // translation eye position mode
+		if (models[cur_idx].scale.z <= 0) models[cur_idx].scale.z = 0;
+	} else if (cur_trans_mode == ViewEye) { // translation eye position mode
 		// if scroll up, then object and quad will be more close.
 		// if scroll down, then object and quad will be more farther.
-		if (yoffset > 0)
-			main_camera.position.z -= 0.025f;
-		else
-			main_camera.position.z += 0.025f;
+		if (yoffset > 0) main_camera.position.z -= 0.025f;
+		else main_camera.position.z += 0.025f;
 		setViewingMatrix(); // update the viewing matrix
 		std::cout << "Camera Viewing Position = ( " << main_camera.position.x << ", " << main_camera.position.y << ", " << main_camera.position.z << " )" << std::endl;
-	} 
-	else if (cur_trans_mode == ViewCenter) { // translate viewing center position mode
+	} else if (cur_trans_mode == ViewCenter) { // translate viewing center position mode
 		// if scroll up, then object and quad will vanish at main_camera.center = (0, 0, 0).
 		// if scroll down, then object and quad  will not change.
-		if (yoffset > 0)
-			main_camera.center.z += 0.025f;
-		else
-			main_camera.center.z -= 0.025f;	
+		if (yoffset > 0) main_camera.center.z += 0.025f;
+		else main_camera.center.z -= 0.025f;	
 		setViewingMatrix(); // update the viewing matrix
 		std::cout << "Camera Viewing Direction = ( " << main_camera.center.x - main_camera.position.x << ", " << main_camera.center.y - main_camera.position.y << ", " << main_camera.center.z - main_camera.position.z << " )" << std::endl;
 	}
 	else if (cur_trans_mode == ViewUp) { // translate camera up vector position mode
 		// if scroll up, then object and quad will not change.
 		// if scroll down, then object and quad will not change.		
-		if (yoffset > 0)
-			main_camera.up_vector.z += 0.025f;
-		else
-			main_camera.up_vector.z -= 0.025f;
+		if (yoffset > 0) main_camera.up_vector.z += 0.025f;
+		else main_camera.up_vector.z -= 0.025f;
 		setViewingMatrix(); // update the viewing matrix
 		std::cout << "Camera Up Vector = ( " << main_camera.up_vector.x << ", " << main_camera.up_vector.y << ", " << main_camera.up_vector.z << " )" << std::endl;
 	}
@@ -554,46 +543,50 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 {
 	// [TODO] Call back function for mouse
+	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+		mouse_pressed = true;
+	} else if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE) {
+		mouse_pressed = false;
+		starting_press_x = -1;
+		starting_press_y = -1;
+	}
 }
 
 static void cursor_pos_callback(GLFWwindow* window, double xpos, double ypos)
 {
 	// [TODO] Call back function for cursor position
-	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS && mouse_pressed == false)
+	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS && mouse_pressed == false){
 		mouse_pressed = true;
-	else {
+	} else {
 		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE) {
 			mouse_pressed = false;
 			return;
-		}
-		else {
+		} else {
 			if (cur_trans_mode == GeoTranslation) { // translation mode
-				// if cursor shift right, then object will be translated right.
-				// if cursor shift left, then object will be translated left.
-				// if cursor shift up, then object will be translated up.
-				// if cursor shift down, then object will be translated down.
+				/* if cursor shift right, then object will be translated right.
+				   if cursor shift left, then object will be translated left.
+				   if cursor shift up, then object will be translated up.
+				   if cursor shift down, then object will be translated down.
+				*/
 				
 				if ((xpos - starting_press_x) > 0 && (ypos - starting_press_y) > 0) {
 					models[cur_idx].position.x += 0.02f;
 					models[cur_idx].position.y += 0.02f;
-				}
-				else if ((xpos - starting_press_x) > 0 && (ypos - starting_press_y) == 0)
+				} else if ((xpos - starting_press_x) > 0 && (ypos - starting_press_y) == 0) {
 					models[cur_idx].position.x += 0.02f;
-				else if ((xpos - starting_press_x) > 0 && (ypos - starting_press_y) < 0) {
+				} else if ((xpos - starting_press_x) > 0 && (ypos - starting_press_y) < 0) {
 					models[cur_idx].position.x += 0.02f;
 					models[cur_idx].position.y += 0.02f;
-				}
-				else if ((xpos - starting_press_x) == 0 && (ypos - starting_press_y) > 0)
+				} else if ((xpos - starting_press_x) == 0 && (ypos - starting_press_y) > 0) {
 					models[cur_idx].position.y -= 0.02f;
-				else if ((xpos - starting_press_x) == 0 && (ypos - starting_press_y) < 0)
+				} else if ((xpos - starting_press_x) == 0 && (ypos - starting_press_y) < 0) {
 					models[cur_idx].position.y += 0.02f;
-				else if ((xpos - starting_press_x) < 0 && (ypos - starting_press_y) > 0) {
+				} else if ((xpos - starting_press_x) < 0 && (ypos - starting_press_y) > 0) {
 					models[cur_idx].position.x -= 0.02f;
 					models[cur_idx].position.y -= 0.02f;
-				}
-				else if ((xpos - starting_press_x) < 0 && (ypos - starting_press_y) == 0)
+				} else if ((xpos - starting_press_x) < 0 && (ypos - starting_press_y) == 0){
 					models[cur_idx].position.x -= 0.02f;
-				else if ((xpos - starting_press_x) < 0 && (ypos - starting_press_y) < 0) {
+				} else if ((xpos - starting_press_x) < 0 && (ypos - starting_press_y) < 0) {
 					models[cur_idx].position.x -= 0.02f;
 					models[cur_idx].position.y += 0.02f;
 				}
@@ -601,32 +594,29 @@ static void cursor_pos_callback(GLFWwindow* window, double xpos, double ypos)
 				starting_press_y = ypos;
 			}
 			else if (cur_trans_mode == GeoRotation) { // rotation mode
-				// if cursor shift right, then object will counterclockwise.
-				// if cursor shift left, then object will clockwise.
-				// if cursor shiht up, then object will fall forward.
-				// if cursor shit down, then object will fall back.
-		
+				/* if cursor shift right, then object will counterclockwise.
+				   if cursor shift left, then object will clockwise.
+				   if cursor shiht up, then object will fall forward.
+				   if cursor shit down, then object will fall back.
+				*/
 				if ((xpos - starting_press_x) > 0 && (ypos - starting_press_y) > 0) {
 					models[cur_idx].rotation.y -= 0.05f;
 					models[cur_idx].rotation.x += 0.05f;
-				}
-				else if ((xpos - starting_press_x) > 0 && (ypos - starting_press_y) == 0)
+				} else if ((xpos - starting_press_x) > 0 && (ypos - starting_press_y) == 0) {
 					models[cur_idx].rotation.y -= 0.05f;
-				else if ((xpos - starting_press_x) > 0 && (ypos - starting_press_y) < 0) {
+				} else if ((xpos - starting_press_x) > 0 && (ypos - starting_press_y) < 0) {
 					models[cur_idx].rotation.y -= 0.05f;
 					models[cur_idx].rotation.x += 0.05f;
-				}
-				else if ((xpos - starting_press_x) == 0 && (ypos - starting_press_y) > 0)
+				} else if ((xpos - starting_press_x) == 0 && (ypos - starting_press_y) > 0) {
 					models[cur_idx].rotation.x -= 0.05f;
-				else if ((xpos - starting_press_x) == 0 && (ypos - starting_press_y) < 0)
+				} else if ((xpos - starting_press_x) == 0 && (ypos - starting_press_y) < 0) {
 					models[cur_idx].rotation.x += 0.05f;
-				else if ((xpos - starting_press_x) < 0 && (ypos - starting_press_y) > 0) {
+				} else if ((xpos - starting_press_x) < 0 && (ypos - starting_press_y) > 0) {
 					models[cur_idx].rotation.y += 0.05f;
 					models[cur_idx].rotation.x -= 0.05f;
-				}
-				else if ((xpos - starting_press_x) < 0 && (ypos - starting_press_y) == 0)
+				} else if ((xpos - starting_press_x) < 0 && (ypos - starting_press_y) == 0) {
 					models[cur_idx].rotation.y += 0.05f;
-				else if ((xpos - starting_press_x) < 0 && (ypos - starting_press_y) < 0) {
+				} else if ((xpos - starting_press_x) < 0 && (ypos - starting_press_y) < 0) {
 					models[cur_idx].rotation.y += 0.05f;
 					models[cur_idx].rotation.x += 0.05f;
 				}
@@ -634,32 +624,29 @@ static void cursor_pos_callback(GLFWwindow* window, double xpos, double ypos)
 				starting_press_y = ypos;
 			}
 			else if (cur_trans_mode == GeoScaling) { // scale mode			
-				// if cursor shift right, then object will be thinner. // followed by demo.
-				// if cursor shift left, then object will be fatter. // followed by demo.
-				// if cursor shiht up, then object will be higher.
-				// if cursor shit down, then object will be shorter.
-
+				/* if cursor shift right, then object will be thinner. // followed by demo.
+				   if cursor shift left, then object will be fatter. // followed by demo.
+				   if cursor shiht up, then object will be higher.
+				   if cursor shit down, then object will be shorter.
+				*/
 				if ((xpos - starting_press_x) > 0 && (ypos - starting_press_y) > 0) {
 					models[cur_idx].scale.x -= 0.02f;
 					models[cur_idx].scale.y += 0.02f;
-				}
-				else if ((xpos - starting_press_x) > 0 && (ypos - starting_press_y) == 0)
+				} else if ((xpos - starting_press_x) > 0 && (ypos - starting_press_y) == 0) {
 					models[cur_idx].scale.x -= 0.02f;
-				else if ((xpos - starting_press_x) > 0 && (ypos - starting_press_y) < 0) {
+				} else if ((xpos - starting_press_x) > 0 && (ypos - starting_press_y) < 0) {
 					models[cur_idx].scale.x -= 0.02f;
 					models[cur_idx].scale.y += 0.02f;
-				}
-				else if ((xpos - starting_press_x) == 0 && (ypos - starting_press_y) > 0)
+				} else if ((xpos - starting_press_x) == 0 && (ypos - starting_press_y) > 0) {
 					models[cur_idx].scale.y -= 0.02f;
-				else if ((xpos - starting_press_x) == 0 && (ypos - starting_press_y) < 0)
+				} else if ((xpos - starting_press_x) == 0 && (ypos - starting_press_y) < 0) {
 					models[cur_idx].scale.y += 0.02f;
-				else if ((xpos - starting_press_x) < 0 && (ypos - starting_press_y) > 0) {
+				} else if ((xpos - starting_press_x) < 0 && (ypos - starting_press_y) > 0) {
 					models[cur_idx].scale.x += 0.02f;
 					models[cur_idx].scale.y -= 0.02f;
-				}
-				else if ((xpos - starting_press_x) < 0 && (ypos - starting_press_y) == 0)
+				} else if ((xpos - starting_press_x) < 0 && (ypos - starting_press_y) == 0) {
 					models[cur_idx].scale.x += 0.02f;
-				else if ((xpos - starting_press_x) < 0 && (ypos - starting_press_y) < 0) {
+				} else if ((xpos - starting_press_x) < 0 && (ypos - starting_press_y) < 0) {
 					models[cur_idx].scale.x += 0.02f;
 					models[cur_idx].scale.y += 0.02f;
 				}
@@ -667,32 +654,30 @@ static void cursor_pos_callback(GLFWwindow* window, double xpos, double ypos)
 				starting_press_y = ypos;
 			}
 			else if (cur_trans_mode == ViewEye) { // translate eye position mode
-				// if cursor shift right, then object and quad will counterclockwise right
-				// if cursor shift left, then object and quad will clockwise left.
-				// if cursor shiht up, then object and quad will lean back.
-				// if cursor shit down, then object and quad will fall back.
+				/* if cursor shift right, then object and quad will counterclockwise right
+				   if cursor shift left, then object and quad will clockwise left.
+				   if cursor shiht up, then object and quad will lean back.
+				 if cursor shit down, then object and quad will fall back.
+				*/
 
 				if ((xpos - starting_press_x) > 0 && (ypos - starting_press_y) > 0) {
 					main_camera.position.x -= 0.01f;
 					main_camera.position.y -= 0.01f;
-				}
-				else if ((xpos - starting_press_x) > 0 && (ypos - starting_press_y) == 0)
+				} else if ((xpos - starting_press_x) > 0 && (ypos - starting_press_y) == 0) {
 					main_camera.position.x -= 0.01f;
-				else if ((xpos - starting_press_x) > 0 && (ypos - starting_press_y) < 0) {
+				} else if ((xpos - starting_press_x) > 0 && (ypos - starting_press_y) < 0) {
 					main_camera.position.x -= 0.01f;
 					main_camera.position.y += 0.01f;
-				}
-				else if ((xpos - starting_press_x) == 0 && (ypos - starting_press_y) > 0)
+				} else if ((xpos - starting_press_x) == 0 && (ypos - starting_press_y) > 0) {
 					main_camera.position.y -= 0.01f;
-				else if ((xpos - starting_press_x) == 0 && (ypos - starting_press_y) < 0)
+				} else if ((xpos - starting_press_x) == 0 && (ypos - starting_press_y) < 0) {
 					main_camera.position.y += 0.01f;
-				else if ((xpos - starting_press_x) < 0 && (ypos - starting_press_y) > 0) {
+				} else if ((xpos - starting_press_x) < 0 && (ypos - starting_press_y) > 0) {
 					main_camera.position.x += 0.01f;
 					main_camera.position.y -= 0.01f;
-				}
-				else if ((xpos - starting_press_x) < 0 && (ypos - starting_press_y) == 0)
+				} else if ((xpos - starting_press_x) < 0 && (ypos - starting_press_y) == 0) {
 					main_camera.position.x += 0.01f;
-				else if ((xpos - starting_press_x) < 0 && (ypos - starting_press_y) < 0) {
+				} else if ((xpos - starting_press_x) < 0 && (ypos - starting_press_y) < 0) {
 					main_camera.position.x += 0.01f;
 					main_camera.position.y += 0.01f;
 				}
@@ -700,34 +685,30 @@ static void cursor_pos_callback(GLFWwindow* window, double xpos, double ypos)
 				starting_press_y = ypos;
 				setViewingMatrix(); // update the viewing matrix
 				std::cout << "Camera Viewing Position = ( " << main_camera.position.x << ", " << main_camera.position.y << ", " << main_camera.position.z << " )" << std::endl;
-			}
-			else if (cur_trans_mode == ViewCenter) { // translate viewing center position mode
-				// if cursor shift right, then object and quad will be translated right.
-				// if cursor shift left, then object and quad will be translated left.
-				// if cursor shiht up, then object and quad will be translated up.
-				// if cursor shit down, then object and quad will be translated down.
-
+			} else if (cur_trans_mode == ViewCenter) { // translate viewing center position mode
+				/* if cursor shift right, then object and quad will be translated right.
+				   if cursor shift left, then object and quad will be translated left.
+				   if cursor shiht up, then object and quad will be translated up.
+				   if cursor shit down, then object and quad will be translated down.
+				*/
 				if ((xpos - starting_press_x) > 0 && (ypos - starting_press_y) > 0) {
 					main_camera.center.x -= 0.03f;
 					main_camera.center.y += 0.03f;
-				}
-				else if ((xpos - starting_press_x) > 0 && (ypos - starting_press_y) == 0)
+				} else if ((xpos - starting_press_x) > 0 && (ypos - starting_press_y) == 0) {
 					main_camera.center.x -= 0.03f;
-				else if ((xpos - starting_press_x) > 0 && (ypos - starting_press_y) < 0) {
+				} else if ((xpos - starting_press_x) > 0 && (ypos - starting_press_y) < 0) {
 					main_camera.center.x -= 0.03f;
 					main_camera.center.y -= 0.03f;
-				}
-				else if ((xpos - starting_press_x) == 0 && (ypos - starting_press_y) > 0)
+				} else if ((xpos - starting_press_x) == 0 && (ypos - starting_press_y) > 0) {
 					main_camera.center.y += 0.03f;
-				else if ((xpos - starting_press_x) == 0 && (ypos - starting_press_y) < 0)
+				} else if ((xpos - starting_press_x) == 0 && (ypos - starting_press_y) < 0) {
 					main_camera.center.y -= 0.03f;
-				else if ((xpos - starting_press_x) < 0 && (ypos - starting_press_y) > 0) {
+				} else if ((xpos - starting_press_x) < 0 && (ypos - starting_press_y) > 0) {
 					main_camera.center.x += 0.03f;
 					main_camera.center.y += 0.03f;
-				}
-				else if ((xpos - starting_press_x) < 0 && (ypos - starting_press_y) == 0)
+				} else if ((xpos - starting_press_x) < 0 && (ypos - starting_press_y) == 0) {
 					main_camera.center.x += 0.03f;
-				else if ((xpos - starting_press_x) < 0 && (ypos - starting_press_y) < 0) {
+				} else if ((xpos - starting_press_x) < 0 && (ypos - starting_press_y) < 0) {
 					main_camera.center.x += 0.03f;
 					main_camera.center.y -= 0.03f;
 				}
@@ -737,31 +718,29 @@ static void cursor_pos_callback(GLFWwindow* window, double xpos, double ypos)
 				std::cout << "Camera Viewing Direction = ( " << main_camera.center.x - main_camera.position.x << ", " << main_camera.center.y - main_camera.position.y << ", " << main_camera.center.z - main_camera.position.z << " )" << std::endl;
 			}
 			else if (cur_trans_mode == ViewUp) { // translate camera up vector position mode
-				// if cursor shift right, then object and quad will clockwise.
-				// if cursor shift left, then object and quad will counterclockwise.
-				// if cursor shiht up, then object and quad will not change.
-				// if cursor shit down, then object and quad will not change.
+				/* if cursor shift right, then object and quad will clockwise.
+				   if cursor shift left, then object and quad will counterclockwise.
+				   if cursor shiht up, then object and quad will not change.
+				   if cursor shit down, then object and quad will not change.
+				*/
 				if ((xpos - starting_press_x) > 0 && (ypos - starting_press_y) > 0) {
 					main_camera.up_vector.x += 0.03f;
 					main_camera.up_vector.y += 0.03f;
-				}
-				else if ((xpos - starting_press_x) > 0 && (ypos - starting_press_y) == 0)
+				} else if ((xpos - starting_press_x) > 0 && (ypos - starting_press_y) == 0) {
 					main_camera.up_vector.x += 0.03f;
-				else if ((xpos - starting_press_x) > 0 && (ypos - starting_press_y) < 0) {
+				} else if ((xpos - starting_press_x) > 0 && (ypos - starting_press_y) < 0) {
 					main_camera.up_vector.x += 0.03f;
 					main_camera.up_vector.y -= 0.03f;
-				}
-				else if ((xpos - starting_press_x) == 0 && (ypos - starting_press_y) > 0)
+				} else if ((xpos - starting_press_x) == 0 && (ypos - starting_press_y) > 0) {
 					main_camera.up_vector.y += 0.03f;
-				else if ((xpos - starting_press_x) == 0 && (ypos - starting_press_y) < 0)
+				} else if ((xpos - starting_press_x) == 0 && (ypos - starting_press_y) < 0) {
 					main_camera.up_vector.y -= 0.03f;
-				else if ((xpos - starting_press_x) < 0 && (ypos - starting_press_y) > 0) {
+				} else if ((xpos - starting_press_x) < 0 && (ypos - starting_press_y) > 0) {
 					main_camera.up_vector.x -= 0.03f;
 					main_camera.up_vector.y += 0.03f;
-				}
-				else if ((xpos - starting_press_x) < 0 && (ypos - starting_press_y) == 0)
+				} else if ((xpos - starting_press_x) < 0 && (ypos - starting_press_y) == 0) {
 					main_camera.up_vector.x -= 0.03f;
-				else if ((xpos - starting_press_x) < 0 && (ypos - starting_press_y) < 0) {
+				} else if ((xpos - starting_press_x) < 0 && (ypos - starting_press_y) < 0) {
 					main_camera.up_vector.x -= 0.03f;
 					main_camera.up_vector.y -= 0.03f;
 				}
@@ -808,8 +787,7 @@ void setShaders()
 	glCompileShader(f);
 	// check for shader compile errors
 	glGetShaderiv(f, GL_COMPILE_STATUS, &success);
-	if (!success)
-	{
+	if (!success) {
 		glGetShaderInfoLog(f, 1000, NULL, infoLog);
 		std::cout << "ERROR: FRAGMENT SHADER COMPILATION FAILED\n" << infoLog << std::endl;
 	}
@@ -835,10 +813,9 @@ void setShaders()
 
 	iLocMVP = glGetUniformLocation(p, "mvp");
 
-	if (success)
+	if (success) {
 		glUseProgram(p);
-    else
-    {
+	} else {
         system("pause");
         exit(123);
     }
@@ -850,51 +827,20 @@ void normalization(tinyobj::attrib_t* attrib, vector<GLfloat>& vertices, vector<
 	float minX = 10000, maxX = -10000, minY = 10000, maxY = -10000, minZ = 10000, maxZ = -10000;
 
 	// find out min and max value of X, Y and Z axis
-	for (int i = 0; i < attrib->vertices.size(); i++)
-	{
+	for (int i = 0; i < attrib->vertices.size(); i++) {
 		//maxs = max(maxs, attrib->vertices.at(i));
-		if (i % 3 == 0)
-		{
-
+		if (i % 3 == 0) {
 			xVector.push_back(attrib->vertices.at(i));
-
-			if (attrib->vertices.at(i) < minX)
-			{
-				minX = attrib->vertices.at(i);
-			}
-
-			if (attrib->vertices.at(i) > maxX)
-			{
-				maxX = attrib->vertices.at(i);
-			}
-		}
-		else if (i % 3 == 1)
-		{
+			if (attrib->vertices.at(i) < minX) minX = attrib->vertices.at(i);
+			if (attrib->vertices.at(i) > maxX) maxX = attrib->vertices.at(i);
+		} else if (i % 3 == 1) {
 			yVector.push_back(attrib->vertices.at(i));
-
-			if (attrib->vertices.at(i) < minY)
-			{
-				minY = attrib->vertices.at(i);
-			}
-
-			if (attrib->vertices.at(i) > maxY)
-			{
-				maxY = attrib->vertices.at(i);
-			}
-		}
-		else if (i % 3 == 2)
-		{
+			if (attrib->vertices.at(i) < minY) minY = attrib->vertices.at(i);
+			if (attrib->vertices.at(i) > maxY) maxY = attrib->vertices.at(i);
+		} else if (i % 3 == 2) {
 			zVector.push_back(attrib->vertices.at(i));
-
-			if (attrib->vertices.at(i) < minZ)
-			{
-				minZ = attrib->vertices.at(i);
-			}
-
-			if (attrib->vertices.at(i) > maxZ)
-			{
-				maxZ = attrib->vertices.at(i);
-			}
+			if (attrib->vertices.at(i) < minZ) minZ = attrib->vertices.at(i);
+			if (attrib->vertices.at(i) > maxZ) maxZ = attrib->vertices.at(i);
 		}
 	}
 
@@ -902,18 +848,12 @@ void normalization(tinyobj::attrib_t* attrib, vector<GLfloat>& vertices, vector<
 	float offsetY = (maxY + minY) / 2;
 	float offsetZ = (maxZ + minZ) / 2;
 
-	for (int i = 0; i < attrib->vertices.size(); i++)
-	{
-		if (offsetX != 0 && i % 3 == 0)
-		{
+	for (int i = 0; i < attrib->vertices.size(); i++) {
+		if (offsetX != 0 && i % 3 == 0) {
 			attrib->vertices.at(i) = attrib->vertices.at(i) - offsetX;
-		}
-		else if (offsetY != 0 && i % 3 == 1)
-		{
+		} else if (offsetY != 0 && i % 3 == 1) {
 			attrib->vertices.at(i) = attrib->vertices.at(i) - offsetY;
-		}
-		else if (offsetZ != 0 && i % 3 == 2)
-		{
+		} else if (offsetZ != 0 && i % 3 == 2) {
 			attrib->vertices.at(i) = attrib->vertices.at(i) - offsetZ;
 		}
 	}
@@ -922,23 +862,16 @@ void normalization(tinyobj::attrib_t* attrib, vector<GLfloat>& vertices, vector<
 	float distanceOfYAxis = maxY - minY;
 	float distanceOfZAxis = maxZ - minZ;
 
-	if (distanceOfYAxis > greatestAxis)
-	{
-		greatestAxis = distanceOfYAxis;
-	}
-
-	if (distanceOfZAxis > greatestAxis)
-	{
-		greatestAxis = distanceOfZAxis;
-	}
+	if (distanceOfYAxis > greatestAxis) greatestAxis = distanceOfYAxis;
+	if (distanceOfZAxis > greatestAxis) greatestAxis = distanceOfZAxis;
 
 	float scale = greatestAxis / 2;
 
-	for (int i = 0; i < attrib->vertices.size(); i++)
-	{
+	for (int i = 0; i < attrib->vertices.size(); i++) {
 		//std::cout << i << " = " << (double)(attrib.vertices.at(i) / greatestAxis) << std::endl;
 		attrib->vertices.at(i) = attrib->vertices.at(i)/ scale;
 	}
+	
 	size_t index_offset = 0;
 	vertices.reserve(shape->mesh.num_face_vertices.size() * 3);
 	colors.reserve(shape->mesh.num_face_vertices.size() * 3);
@@ -1062,13 +995,11 @@ void glPrintContextInfo(bool printExtension)
 	cout << "GL_RENDERER = " << (const char*)glGetString(GL_RENDERER) << endl;
 	cout << "GL_VERSION = " << (const char*)glGetString(GL_VERSION) << endl;
 	cout << "GL_SHADING_LANGUAGE_VERSION = " << (const char*)glGetString(GL_SHADING_LANGUAGE_VERSION) << endl;
-	if (printExtension)
-	{
+	if (printExtension) {
 		GLint numExt;
 		glGetIntegerv(GL_NUM_EXTENSIONS, &numExt);
 		cout << "GL_EXTENSIONS =" << endl;
-		for (GLint i = 0; i < numExt; i++)
-		{
+		for (GLint i = 0; i < numExt; i++) {
 			cout << "\t" << (const char*)glGetStringi(GL_EXTENSIONS, i) << endl;
 		}
 	}
@@ -1119,8 +1050,7 @@ int main(int argc, char **argv)
 	setupRC();
 	
 	// main loop
-    while (!glfwWindowShouldClose(window))
-    {
+    while (!glfwWindowShouldClose(window)) {
         // render
         RenderScene();
         

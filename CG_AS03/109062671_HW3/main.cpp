@@ -162,13 +162,13 @@ enum ProjMode
 	Perspective = 1
 };
 
-enum MagTexFilteringMode 
+enum MagTexFilteringMode
 {
 	mag_nearest_sampling = 0,
 	linear_sampling = 1
 };
 
-enum MinTexFilteringMode 
+enum MinTexFilteringMode
 {
 	min_nearest_sampling = 0,
 	linear_mipmap_linear_sampling = 1
@@ -363,7 +363,7 @@ void setOrthogonal()
 void setPerspective()
 {
 	const float tanHalfFOV = tanf((proj.fovy / 2.0) / 180.0 * acosf(-1.0));
-	
+
 	cur_proj_mode = Perspective;
 	project_matrix[0] = 1.0f / (tanHalfFOV * proj.aspect);
 	project_matrix[1] = 0;
@@ -388,10 +388,7 @@ void ChangeSize(GLFWwindow* window, int width, int height)
 {
 	// glViewport(0, 0, width, height);
 	proj.aspect = (float)(width / 2) / (float)height;
-	if (cur_proj_mode == Perspective) {
-		setPerspective();
-	}
-
+	if (cur_proj_mode == Perspective) setPerspective();
 	screenWidth = width;
 	screenHeight = height;
 }
@@ -405,7 +402,7 @@ void Vector3ToFloat4(Vector3 v, GLfloat res[4])
 }
 
 // Render function for display rendering
-void RenderScene(int per_vertex_or_per_pixel) {	
+void RenderScene(int per_vertex_or_per_pixel) {
 	Vector3 modelPos = models[cur_idx].position;
 
 	Matrix4 T, R, S;
@@ -430,22 +427,19 @@ void RenderScene(int per_vertex_or_per_pixel) {
 
 	glUniform3f(iLocDiffIntensity, Diffuse_intensity.x, Diffuse_intensity.y, Diffuse_intensity.z);
 	glUniform3f(iLocAmbIntensity, Ambient_intensity.x, Ambient_intensity.y, Ambient_intensity.z);
-	
+
 	if (cur_light_mode == Directional_light_mode) {
 		light_mode = 0;
 		glUniform1i(iLoclight_mode, light_mode);
 		glUniform3f(iLocLightPos, Directional_light.position.x, Directional_light.position.y, Directional_light.position.z);
-	}
-	else if (cur_light_mode == Point_light_mode) {
+	} else if (cur_light_mode == Point_light_mode) {
 		light_mode = 1;
 		glUniform1i(iLoclight_mode, light_mode);
 		glUniform3f(iLocLightPos, Point_light.position.x, Point_light.position.y, Point_light.position.z);
 		glUniform1f(iLocAttConstant, Attenuation_Point_light.constant);
 		glUniform1f(iLocAttLinear, Attenuation_Point_light.linear);
 		glUniform1f(iLocAttQuadratic, Attenuation_Point_light.quadratic);
-
-	}
-	else if (cur_light_mode == Spot_light_mode) {
+	} else if (cur_light_mode == Spot_light_mode) {
 		light_mode = 2;
 		glUniform1i(iLoclight_mode, light_mode);
 		glUniform3f(iLocLightPos, Spot_light.position.x, Spot_light.position.y, Spot_light.position.z);
@@ -458,8 +452,7 @@ void RenderScene(int per_vertex_or_per_pixel) {
 	}
 
 
-	for (int i = 0; i < models[cur_idx].shapes.size(); i++)
-	{
+	for (int i = 0; i < models[cur_idx].shapes.size(); i++) {
 		glUniform3f(iLocmaterial_ka, models[cur_idx].shapes[i].material.Ka.x, models[cur_idx].shapes[i].material.Ka.y, models[cur_idx].shapes[i].material.Ka.z);
 		glUniform3f(iLocmaterial_kd, models[cur_idx].shapes[i].material.Kd.x, models[cur_idx].shapes[i].material.Kd.y, models[cur_idx].shapes[i].material.Kd.z);
 		glUniform3f(iLocmaterial_ks, models[cur_idx].shapes[i].material.Ks.x, models[cur_idx].shapes[i].material.Ks.y, models[cur_idx].shapes[i].material.Ks.z);
@@ -471,33 +464,36 @@ void RenderScene(int per_vertex_or_per_pixel) {
 		models[cur_idx].shapes[i].material.offsets.push_back(_Offset(0.5f, 0.0f)); // ID 5
 		models[cur_idx].shapes[i].material.offsets.push_back(_Offset(0.5f, -0.25f)); // ID 6
 		models[cur_idx].shapes[i].material.offsets.push_back(_Offset(0.5f, -0.5f)); // ID 7
-		if (models[cur_idx].hasEye == true && i == models[cur_idx].shapes[i].material.isEye)
-			glUniform2f(iLocTexCoordOffset, models[cur_idx].shapes[i].material.offsets[models[cur_idx].cur_eye_offset_idx].x, models[cur_idx].shapes[i].material.offsets[models[cur_idx].cur_eye_offset_idx].y);
-		else
-			glUniform2f(iLocTexCoordOffset, models[cur_idx].shapes[i].material.offsets[0].x, models[cur_idx].shapes[i].material.offsets[0].y);
-		
+		if (models[cur_idx].hasEye == true && i == models[cur_idx].shapes[i].material.isEye) {
+			glUniform2f(iLocTexCoordOffset, models[cur_idx].shapes[i].material.offsets[models[cur_idx].cur_eye_offset_idx].x,
+			 models[cur_idx].shapes[i].material.offsets[models[cur_idx].cur_eye_offset_idx].y);
+		} else {
+			glUniform2f(iLocTexCoordOffset, models[cur_idx].shapes[i].material.offsets[0].x,
+			 models[cur_idx].shapes[i].material.offsets[0].y);
+		}
 		glBindVertexArray(models[cur_idx].shapes[i].vao);
 
 		// [TODO] Bind texture and modify texture filtering & wrapping mode
 		// Hint: glActiveTexture, glBindTexture, glTexParameteri
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, models[cur_idx].shapes[i].material.diffuseTexture);
-		
+
 		// texcoord
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); // GL_CLAMP for the one which exceed texcoord
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT); // GL_CLAMP for the one which exceed texcoord
 
 		// [TODO] adjust different filtering mode
-		if (cur_mag_tex_filter_mode == mag_nearest_sampling)
+		if (cur_mag_tex_filter_mode == mag_nearest_sampling) {
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		else // cur_mag_tex_filter_mode == linear_sampling
+		} else {// cur_mag_tex_filter_mode == linear_sampling
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		if (cur_min_tex_filter_mode == min_nearest_sampling)
+		}
+		if (cur_min_tex_filter_mode == min_nearest_sampling) {
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		else // cur_min_tex_filter_mode = linear_mipmap_linear_sampling
+		} else { // cur_min_tex_filter_mode = linear_mipmap_linear_sampling
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-		
-		// modulation 
+		}
+		// modulation
 		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
 		glDrawArrays(GL_TRIANGLES, 0, models[cur_idx].shapes[i].vertex_count);
@@ -576,19 +572,19 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 		case GLFW_KEY_I:
 			cout << endl;
 			break;
-		case GLFW_KEY_G: // switch the magnification texture filtering mode 
+		case GLFW_KEY_G: // switch the magnification texture filtering mode
 			// between nearest / linear sampling
-			if (cur_mag_tex_filter_mode == mag_nearest_sampling) 
+			if (cur_mag_tex_filter_mode == mag_nearest_sampling)
 				cur_mag_tex_filter_mode = linear_sampling;
 			else
 				cur_mag_tex_filter_mode = mag_nearest_sampling;
 			cout << "cur_mag_tex_filter_mode = " << cur_mag_tex_filter_mode << endl;
 			break;
-		case GLFW_KEY_B: // switch the minification texture filtering mode 
+		case GLFW_KEY_B: // switch the minification texture filtering mode
 			// between nearest / linear_mipmap_linear sampling
 			if (cur_min_tex_filter_mode == min_nearest_sampling)
 				cur_min_tex_filter_mode = linear_mipmap_linear_sampling;
-			else 
+			else
 				cur_min_tex_filter_mode = min_nearest_sampling;
 			cout << "cur_min_tex_filter_mode = " << cur_min_tex_filter_mode << endl;
 			break;
@@ -641,8 +637,7 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 				Diffuse_intensity.x += 0.1f;
 				Diffuse_intensity.y += 0.1f;
 				Diffuse_intensity.z += 0.1f;
-			}
-			else {
+			} else {
 				Diffuse_intensity.x -= 0.1f;
 				Diffuse_intensity.y -= 0.1f;
 				Diffuse_intensity.z -= 0.1f;
@@ -653,33 +648,29 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 				Diffuse_intensity.x += 0.1f;
 				Diffuse_intensity.y += 0.1f;
 				Diffuse_intensity.z += 0.1f;
-			}
-			else {
+			} else {
 				Diffuse_intensity.x -= 0.1f;
 				Diffuse_intensity.y -= 0.1f;
 				Diffuse_intensity.z -= 0.1f;
 			}
 		}
 		else if (cur_light_mode == Spot_light_mode) {
-			if (yoffset > 0)
-				Spot_light.cutoff += 1.0f;
-			else
-				Spot_light.cutoff -= 1.0f;
+			if (yoffset > 0) Spot_light.cutoff += 1.0f;
+			else Spot_light.cutoff -= 1.0f;
 			std::cout << "spot light cutoff: " << Spot_light.cutoff * M_PI / 180 << std::endl;
 		}
 		break;
 	case Shininess_editing_mode:
-		if (yoffset > 0)
-			Shininess += 1.0f;
-		else
-			Shininess -= 1.0f;
+		if (yoffset > 0) Shininess += 1.0f;
+		else Shininess -= 1.0f;
 
-		if (cur_light_mode == Directional_light_mode)
+		if (cur_light_mode == Directional_light_mode) {
 			std::cout << "directional light shininess: " << Shininess << std::endl;
-		else if (cur_light_mode == Point_light_mode)
+		} else if (cur_light_mode == Point_light_mode) {
 			std::cout << "point light shininess: " << Shininess << std::endl;
-		else if (cur_light_mode == Spot_light_mode)
+		} else if (cur_light_mode == Spot_light_mode) {
 			std::cout << "spot light shininess: " << Shininess << std::endl;
+		}
 		break;
 	}
 
@@ -694,7 +685,6 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 		starting_press_x = -1;
 		starting_press_y = -1;
 	}
-		
 }
 
 static void cursor_pos_callback(GLFWwindow* window, double xpos, double ypos)
@@ -703,8 +693,7 @@ static void cursor_pos_callback(GLFWwindow* window, double xpos, double ypos)
 		if (starting_press_x < 0 || starting_press_y < 0) {
 			starting_press_x = (int)xpos;
 			starting_press_y = (int)ypos;
-		}
-		else {
+		} else {
 			float diff_x = starting_press_x - (int)xpos;
 			float diff_y = starting_press_y - (int)ypos;
 			starting_press_x = (int)xpos;
@@ -785,8 +774,7 @@ void setShaders()
 	glCompileShader(v);
 	// check for shader compile errors
 	glGetShaderiv(v, GL_COMPILE_STATUS, &success);
-	if (!success)
-	{
+	if (!success) {
 		glGetShaderInfoLog(v, 1000, NULL, infoLog);
 		std::cout << "ERROR: VERTEX SHADER COMPILATION FAILED\n" << infoLog << std::endl;
 	}
@@ -795,8 +783,7 @@ void setShaders()
 	glCompileShader(f);
 	// check for shader compile errors
 	glGetShaderiv(f, GL_COMPILE_STATUS, &success);
-	if (!success)
-	{
+	if (!success) {
 		glGetShaderInfoLog(f, 1000, NULL, infoLog);
 		std::cout << "ERROR: FRAGMENT SHADER COMPILATION FAILED\n" << infoLog << std::endl;
 	}
@@ -820,10 +807,9 @@ void setShaders()
 	glDeleteShader(v);
 	glDeleteShader(f);
 
-	if (success)
+	if (success){
 		glUseProgram(p);
-    else
-    {
+    } else {
         system("pause");
         exit(123);
     }
@@ -837,70 +823,34 @@ void normalization(tinyobj::attrib_t* attrib, vector<GLfloat>& vertices, vector<
 	float minX = 10000, maxX = -10000, minY = 10000, maxY = -10000, minZ = 10000, maxZ = -10000;
 
 	// find out min and max value of X, Y and Z axis
-	for (int i = 0; i < attrib->vertices.size(); i++)
-	{
+	for (int i = 0; i < attrib->vertices.size(); i++) {
 		//maxs = max(maxs, attrib->vertices.at(i));
-		if (i % 3 == 0)
-		{
+		if (i % 3 == 0) {
 
 			xVector.push_back(attrib->vertices.at(i));
-
-			if (attrib->vertices.at(i) < minX)
-			{
-				minX = attrib->vertices.at(i);
-			}
-
-			if (attrib->vertices.at(i) > maxX)
-			{
-				maxX = attrib->vertices.at(i);
-			}
-		}
-		else if (i % 3 == 1)
-		{
+			if (attrib->vertices.at(i) < minX) minX = attrib->vertices.at(i);
+			if (attrib->vertices.at(i) > maxX) maxX = attrib->vertices.at(i);
+		} else if (i % 3 == 1) {
 			yVector.push_back(attrib->vertices.at(i));
-
-			if (attrib->vertices.at(i) < minY)
-			{
-				minY = attrib->vertices.at(i);
-			}
-
-			if (attrib->vertices.at(i) > maxY)
-			{
-				maxY = attrib->vertices.at(i);
-			}
-		}
-		else if (i % 3 == 2)
-		{
+			if (attrib->vertices.at(i) < minY) minY = attrib->vertices.at(i);
+			if (attrib->vertices.at(i) > maxY) maxY = attrib->vertices.at(i);
+		} else if (i % 3 == 2) {
 			zVector.push_back(attrib->vertices.at(i));
-
-			if (attrib->vertices.at(i) < minZ)
-			{
-				minZ = attrib->vertices.at(i);
-			}
-
-			if (attrib->vertices.at(i) > maxZ)
-			{
-				maxZ = attrib->vertices.at(i);
-			}
+			if (attrib->vertices.at(i) < minZ) minZ = attrib->vertices.at(i);
+			if (attrib->vertices.at(i) > maxZ) maxZ = attrib->vertices.at(i);
 		}
 	}
-	
+
 	float offsetX = (maxX + minX) / 2;
 	float offsetY = (maxY + minY) / 2;
 	float offsetZ = (maxZ + minZ) / 2;
 
-	for (int i = 0; i < attrib->vertices.size(); i++)
-	{
-		if (offsetX != 0 && i % 3 == 0)
-		{
+	for (int i = 0; i < attrib->vertices.size(); i++) {
+		if (offsetX != 0 && i % 3 == 0) {
 			attrib->vertices.at(i) = attrib->vertices.at(i) - offsetX;
-		}
-		else if (offsetY != 0 && i % 3 == 1)
-		{
+		} else if (offsetY != 0 && i % 3 == 1) {
 			attrib->vertices.at(i) = attrib->vertices.at(i) - offsetY;
-		}
-		else if (offsetZ != 0 && i % 3 == 2)
-		{
+		} else if (offsetZ != 0 && i % 3 == 2) {
 			attrib->vertices.at(i) = attrib->vertices.at(i) - offsetZ;
 		}
 	}
@@ -909,20 +859,12 @@ void normalization(tinyobj::attrib_t* attrib, vector<GLfloat>& vertices, vector<
 	float distanceOfYAxis = maxY - minY;
 	float distanceOfZAxis = maxZ - minZ;
 
-	if (distanceOfYAxis > greatestAxis)
-	{
-		greatestAxis = distanceOfYAxis;
-	}
-
-	if (distanceOfZAxis > greatestAxis)
-	{
-		greatestAxis = distanceOfZAxis;
-	}
+	if (distanceOfYAxis > greatestAxis) greatestAxis = distanceOfYAxis;
+	if (distanceOfZAxis > greatestAxis) greatestAxis = distanceOfZAxis;
 
 	float scale = greatestAxis / 2;
 
-	for (int i = 0; i < attrib->vertices.size(); i++)
-	{
+	for (int i = 0; i < attrib->vertices.size(); i++) {
 		//std::cout << i << " = " << (double)(attrib.vertices.at(i) / greatestAxis) << std::endl;
 		attrib->vertices.at(i) = attrib->vertices.at(i)/ scale;
 	}
@@ -956,8 +898,9 @@ void normalization(tinyobj::attrib_t* attrib, vector<GLfloat>& vertices, vector<
 }
 
 static string GetBaseDir(const string& filepath) {
-	if (filepath.find_last_of("/\\") != std::string::npos)
+	if (filepath.find_last_of("/\\") != std::string::npos) {
 		return filepath.substr(0, filepath.find_last_of("/\\"));
+	}
 	return "";
 }
 
@@ -967,8 +910,7 @@ GLuint LoadTextureImage(string image_path)
 	int require_channel = 4;
 	stbi_set_flip_vertically_on_load(true);
 	stbi_uc *data = stbi_load(image_path.c_str(), &width, &height, &channel, require_channel);
-	if (data != NULL)
-	{
+	if (data != NULL) {
 		GLuint tex = 0;
 
 		// [TODO] Bind the image to texture
@@ -980,11 +922,8 @@ GLuint LoadTextureImage(string image_path)
 
 		// free the image from memory after binding to texture
 		stbi_image_free(data);
-		
 		return tex;
-	}
-	else
-	{
+	} else {
 		cout << "LoadTextureImage: Cannot load image from " << image_path << endl;
 		return -1;
 	}
@@ -993,14 +932,11 @@ GLuint LoadTextureImage(string image_path)
 vector<Shape> SplitShapeByMaterial(vector<GLfloat>& vertices, vector<GLfloat>& colors, vector<GLfloat>& normals, vector<GLfloat>& textureCoords, vector<int>& material_id, vector<PhongMaterial>& materials)
 {
 	vector<Shape> res;
-	for (int m = 0; m < materials.size(); m++)
-	{
+	for (int m = 0; m < materials.size(); m++) {
 		vector<GLfloat> m_vertices, m_colors, m_normals, m_textureCoords;
-		for (int v = 0; v < material_id.size(); v++) 
-		{
+		for (int v = 0; v < material_id.size(); v++) {
 			// extract all vertices with same material id and create a new shape for it.
-			if (material_id[v] == m)
-			{
+			if (material_id[v] == m) {
 				m_vertices.push_back(vertices[v * 3 + 0]);
 				m_vertices.push_back(vertices[v * 3 + 1]);
 				m_vertices.push_back(vertices[v * 3 + 2]);
@@ -1018,8 +954,7 @@ vector<Shape> SplitShapeByMaterial(vector<GLfloat>& vertices, vector<GLfloat>& c
 			}
 		}
 
-		if (!m_vertices.empty())
-		{
+		if (!m_vertices.empty()) {
 			Shape tmp_shape;
 			glGenVertexArrays(1, &tmp_shape.vao);
 			glBindVertexArray(tmp_shape.vao);
@@ -1054,7 +989,6 @@ vector<Shape> SplitShapeByMaterial(vector<GLfloat>& vertices, vector<GLfloat>& c
 			res.push_back(tmp_shape);
 		}
 	}
-
 	return res;
 }
 
@@ -1108,25 +1042,22 @@ void LoadTexturedModels(string model_path)
 		material.Ks = Vector3(materials[i].specular[0], materials[i].specular[1], materials[i].specular[2]);
 
 		material.diffuseTexture = LoadTextureImage(base_dir + string(materials[i].diffuse_texname));
-		if (material.diffuseTexture == -1)
-		{
+		if (material.diffuseTexture == -1) {
 			cout << "LoadTexturedModels: Fail to load model's material " << i << endl;
 			system("pause");
-			
+
 		}
-		
 		std::cout << std::string(materials[i].diffuse_texname) << std::endl;
-		
+
 		if (string(materials[i].diffuse_texname).find("Eye") != std::string::npos && tmp_model.hasEye == false) {
 			material.isEye = i;
 			tmp_model.hasEye = true;
 		}
-		
+
 		allMaterial.push_back(material);
 	}
-	
-	for (int i = 0; i < shapes.size(); i++)
-	{
+
+	for (int i = 0; i < shapes.size(); i++) {
 		vertices.clear();
 		colors.clear();
 		normals.clear();
@@ -1164,7 +1095,7 @@ void initParameter()
 
 	setViewingMatrix();
 	setPerspective();	//set default projection matrix as perspective matrix
-	
+
 	// lighting
 	Diffuse_intensity = Vector3(1, 1, 1);
 	Ambient_intensity = Vector3(1, 1, 1); // original (0.15, 0.15, 0.15) (1,1,1)
@@ -1214,7 +1145,7 @@ void setUniformVariables()
 	iLocAttConstant = glGetUniformLocation(program, "AttLightConstant");
 	iLocAttLinear = glGetUniformLocation(program, "AttLightLinear");
 	iLocAttQuadratic = glGetUniformLocation(program, "AttLightQuadratic");
-	
+
 	// [TODO] Get uniform location of texture
 	iLoctexture = glGetUniformLocation(program, "tex");
 	iLocTexCoordOffset = glGetUniformLocation(program, "texcoordoffset");
@@ -1230,9 +1161,8 @@ void setupRC()
 	// OpenGL States and Values
 	glClearColor(0.2, 0.2, 0.2, 1.0);
 
-	for (string model_path : model_list){
-		LoadTexturedModels(model_path);
-	}
+	for (string model_path : model_list) LoadTexturedModels(model_path);
+	
 }
 
 void glPrintContextInfo(bool printExtension)
@@ -1241,13 +1171,11 @@ void glPrintContextInfo(bool printExtension)
 	cout << "GL_RENDERER = " << (const char*)glGetString(GL_RENDERER) << endl;
 	cout << "GL_VERSION = " << (const char*)glGetString(GL_VERSION) << endl;
 	cout << "GL_SHADING_LANGUAGE_VERSION = " << (const char*)glGetString(GL_SHADING_LANGUAGE_VERSION) << endl;
-	if (printExtension)
-	{
+	if (printExtension) {
 		GLint numExt;
 		glGetIntegerv(GL_NUM_EXTENSIONS, &numExt);
 		cout << "GL_EXTENSIONS =" << endl;
-		for (GLint i = 0; i < numExt; i++)
-		{
+		for (GLint i = 0; i < numExt; i++) {
 			cout << "\t" << (const char*)glGetStringi(GL_EXTENSIONS, i) << endl;
 		}
 	}
@@ -1261,32 +1189,28 @@ int main(int argc, char **argv)
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    
+
 #ifdef __APPLE__
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // fix compilation on OS X
 #endif
 
-    
     // create window
 	GLFWwindow* window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "109062671 HW3", NULL, NULL);
-    if (window == NULL)
-    {
+    if (window == NULL) {
         std::cout << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
         return -1;
     }
     glfwMakeContextCurrent(window);
-    
-    
+
     // load OpenGL function pointer
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-    {
+    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
         std::cout << "Failed to initialize GLAD" << std::endl;
         return -1;
     }
 
 	glPrintContextInfo(false);
-    
+
 	// register glfw callback functions
     glfwSetKeyCallback(window, KeyCallback);
 	glfwSetScrollCallback(window, scroll_callback);
@@ -1299,8 +1223,7 @@ int main(int argc, char **argv)
 	setupRC();
 
 	// main loop
-    while (!glfwWindowShouldClose(window))
-    {
+    while (!glfwWindowShouldClose(window)) {
         // render
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 		// render left view
@@ -1309,14 +1232,13 @@ int main(int argc, char **argv)
 		// render right view
 		glViewport(screenWidth / 2, 0, screenWidth / 2, screenHeight);
 		RenderScene(0);
-        
+
         // swap buffer from back to front
         glfwSwapBuffers(window);
-        
+
         // Poll input event
         glfwPollEvents();
     }
-	
 	// just for compatibiliy purposes
 	return 0;
 }

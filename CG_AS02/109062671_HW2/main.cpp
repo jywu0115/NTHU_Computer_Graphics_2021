@@ -389,12 +389,9 @@ void RenderScene(void) {
 	mvp[2] = 0;  mvp[6] = 0;   mvp[10] = 1;   mvp[14] = 0;
 	mvp[3] = 0;  mvp[7] = 0;   mvp[11] = 0;   mvp[15] = 1;
 	
-	for (int i = 0; i < 16; i++)
-		m[i] = GLfloat(M[i]);
-	for (int i = 0; i < 16; i++)
-		v[i] = GLfloat(V[i]);
-	for (int i = 0; i < 16; i++)
-		mvp[i] = GLfloat(MVP[i]);
+	for (int i = 0; i < 16; i++) m[i] = GLfloat(M[i]);
+	for (int i = 0; i < 16; i++) v[i] = GLfloat(V[i]);
+	for (int i = 0; i < 16; i++) mvp[i] = GLfloat(MVP[i]);
 	
 	// use uniform to send mvp to vertex shader
 	glUniformMatrix4fv(iLocM, 1, GL_FALSE, m);
@@ -414,17 +411,14 @@ void RenderScene(void) {
 		light_mode = 0;
 		glUniform1i(iLoclight_mode, light_mode);
 		glUniform3f(iLocLightPos, Directional_light.position.x, Directional_light.position.y, Directional_light.position.z);
-	}
-	else if (cur_light_mode == Point_light_mode) {
+	} else if (cur_light_mode == Point_light_mode) {
 		light_mode = 1;
 		glUniform1i(iLoclight_mode, light_mode);
 		glUniform3f(iLocLightPos, Point_light.position.x, Point_light.position.y, Point_light.position.z);
 		glUniform1f(iLocAttConstant, Attenuation_Point_light.constant);
 		glUniform1f(iLocAttLinear, Attenuation_Point_light.linear);
 		glUniform1f(iLocAttQuadratic, Attenuation_Point_light.quadratic);
-
-	}
-	else if (cur_light_mode == Spot_light_mode) {
+	} else if (cur_light_mode == Spot_light_mode) {
 		light_mode = 2;
 		glUniform1i(iLoclight_mode, light_mode);
 		glUniform3f(iLocLightPos, Spot_light.position.x, Spot_light.position.y, Spot_light.position.z);
@@ -524,111 +518,101 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 	else if (cur_trans_mode == GeoRotation) { // rotation mode
 		// if scroll up, then object will counterclockwise.
 		// if scroll down, then object will clockwise.
-		if (yoffset > 0)
-			models[cur_idx].rotation.z += 1.0f;
-		else
-			models[cur_idx].rotation.z -= 1.0f;
+		if (yoffset > 0) models[cur_idx].rotation.z += 1.0f;
+		else models[cur_idx].rotation.z -= 1.0f;
 	}
 	else if (cur_trans_mode == GeoScaling) { // Scaling mode
 		// if scroll up, then object will be bigger.
 		// if scroll down, then object will be smaller.		
 		models[cur_idx].scale.z += yoffset * 0.01f;
-		if (models[cur_idx].scale.z <= 0)
-			models[cur_idx].scale.z = 0;
-	}
-	else if (cur_trans_mode == Light_editing_mode){
+		if (models[cur_idx].scale.z <= 0) models[cur_idx].scale.z = 0;
+	} else if (cur_trans_mode == Light_editing_mode){
 		if(cur_light_mode == Directional_light_mode){
 			if (yoffset > 0) {
 				Diffuse_intensity.x += 0.1f;
 				Diffuse_intensity.y += 0.1f;
 				Diffuse_intensity.z += 0.1f;
-			}
-			else {
+			} else {
 				Diffuse_intensity.x -= 0.1f;
 				Diffuse_intensity.y -= 0.1f;
 				Diffuse_intensity.z -= 0.1f;
 			}
-		}
-		else if(cur_light_mode == Point_light_mode){
+		} else if(cur_light_mode == Point_light_mode){
 			if (yoffset > 0) {
 				Diffuse_intensity.x += 0.1f;
 				Diffuse_intensity.y += 0.1f;
 				Diffuse_intensity.z += 0.1f;
-			}
-			else {
+			} else {
 				Diffuse_intensity.x -= 0.1f;
 				Diffuse_intensity.y -= 0.1f;
 				Diffuse_intensity.z -= 0.1f;
 			}
-		}
-		else if (cur_light_mode == Spot_light_mode){
-			if (yoffset > 0)
-				Spot_light.cutoff += 1.0f;
-			else
-				Spot_light.cutoff -= 1.0f;
+		} else if (cur_light_mode == Spot_light_mode){
+			if (yoffset > 0) Spot_light.cutoff += 1.0f;
+			else Spot_light.cutoff -= 1.0f;
 			std::cout << "spot light cutoff: " << Spot_light.cutoff * M_PI / 180 << std::endl;
 		}
-	}
-	else if (cur_trans_mode == Shininess_editing_mode){
-		if (yoffset > 0)
-			Shininess += 1.0f;
-		else
-			Shininess -= 1.0f;
+	} else if (cur_trans_mode == Shininess_editing_mode){
+		if (yoffset > 0) Shininess += 1.0f;
+		else Shininess -= 1.0f;
 
-		if (cur_light_mode == Directional_light_mode)
+		if (cur_light_mode == Directional_light_mode) {
 			std::cout << "directional light shininess: " << Shininess << std::endl;
-		else if (cur_light_mode == Point_light_mode)
+		} else if (cur_light_mode == Point_light_mode) {
 			std::cout << "point light shininess: " << Shininess << std::endl;
-		else if (cur_light_mode == Spot_light_mode)
+		} else if (cur_light_mode == Spot_light_mode) {
 			std::cout << "spot light shininess: " << Shininess << std::endl;
-		
+		}
 	}
 }
 
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 {
 	// [TODO] mouse press callback function
-		
+	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS){
+		mouse_pressed = true;
+	} else if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE) {
+		mouse_pressed = false;
+		starting_press_x = -1;
+		starting_press_y = -1;
+	}
 }
 
 static void cursor_pos_callback(GLFWwindow* window, double xpos, double ypos)
 {
 	// [TODO] cursor position callback function
-	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS && mouse_pressed == false)
+	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS && mouse_pressed == false){
 		mouse_pressed = true;
-	else {
+	} else {
 		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE) {
 			mouse_pressed = false;
 			return;
-		}
-		else {
+		} else {
 			if (cur_trans_mode == GeoTranslation) { // translation mode
-				// if cursor shift right, then object will be translated right.
-				// if cursor shift left, then object will be translated left.
-				// if cursor shift up, then object will be translated up.
-				// if cursor shift down, then object will be translated down.
+				/* if cursor shift right, then object will be translated right.
+				 if cursor shift left, then object will be translated left.
+				 if cursor shift up, then object will be translated up.
+				 if cursor shift down, then object will be translated down.
+				*/
 
 				if ((xpos - starting_press_x) > 0 && (ypos - starting_press_y) > 0) {
 					models[cur_idx].position.x += 0.02f;
 					models[cur_idx].position.y += 0.02f;
-				}
-				else if ((xpos - starting_press_x) > 0 && (ypos - starting_press_y) == 0)
+				} else if ((xpos - starting_press_x) > 0 && (ypos - starting_press_y) == 0){
 					models[cur_idx].position.x += 0.02f;
-				else if ((xpos - starting_press_x) > 0 && (ypos - starting_press_y) < 0) {
+				} else if ((xpos - starting_press_x) > 0 && (ypos - starting_press_y) < 0) {
 					models[cur_idx].position.x += 0.02f;
 					models[cur_idx].position.y += 0.02f;
-				}
-				else if ((xpos - starting_press_x) == 0 && (ypos - starting_press_y) > 0)
+				} else if ((xpos - starting_press_x) == 0 && (ypos - starting_press_y) > 0){
 					models[cur_idx].position.y -= 0.02f;
-				else if ((xpos - starting_press_x) == 0 && (ypos - starting_press_y) < 0)
+				} else if ((xpos - starting_press_x) == 0 && (ypos - starting_press_y) < 0){
 					models[cur_idx].position.y += 0.02f;
-				else if ((xpos - starting_press_x) < 0 && (ypos - starting_press_y) > 0) {
+				} else if ((xpos - starting_press_x) < 0 && (ypos - starting_press_y) > 0) {
 					models[cur_idx].position.x -= 0.02f;
 					models[cur_idx].position.y -= 0.02f;
-				}
-				else if ((xpos - starting_press_x) < 0 && (ypos - starting_press_y) == 0)
+				} else if ((xpos - starting_press_x) < 0 && (ypos - starting_press_y) == 0){
 					models[cur_idx].position.x -= 0.02f;
-				else if ((xpos - starting_press_x) < 0 && (ypos - starting_press_y) < 0) {
+				} else if ((xpos - starting_press_x) < 0 && (ypos - starting_press_y) < 0) {
 					models[cur_idx].position.x -= 0.02f;
 					models[cur_idx].position.y += 0.02f;
 				}
@@ -636,152 +620,135 @@ static void cursor_pos_callback(GLFWwindow* window, double xpos, double ypos)
 				starting_press_y = ypos;
 			}
 			else if (cur_trans_mode == GeoRotation) { // rotation mode
-				// if cursor shift right, then object will counterclockwise.
-				// if cursor shift left, then object will clockwise.
-				// if cursor shiht up, then object will fall forward.
-				// if cursor shit down, then object will fall back.
+				/* if cursor shift right, then object will counterclockwise.
+				   if cursor shift left, then object will clockwise.
+				   if cursor shiht up, then object will fall forward.
+				   if cursor shit down, then object will fall back.
+				*/
 
 				if ((xpos - starting_press_x) > 0 && (ypos - starting_press_y) > 0) {
 					models[cur_idx].rotation.y += 1.0f;
 					models[cur_idx].rotation.x -= 1.0f;
-				}
-				else if ((xpos - starting_press_x) > 0 && (ypos - starting_press_y) == 0)
+				} else if ((xpos - starting_press_x) > 0 && (ypos - starting_press_y) == 0){
 					models[cur_idx].rotation.y += 1.0f;
-				else if ((xpos - starting_press_x) > 0 && (ypos - starting_press_y) < 0) {
+				} else if ((xpos - starting_press_x) > 0 && (ypos - starting_press_y) < 0) {
 					models[cur_idx].rotation.y += 1.0f;
 					models[cur_idx].rotation.x -= 1.0f;
-				}
-				else if ((xpos - starting_press_x) == 0 && (ypos - starting_press_y) > 0)
+				} else if ((xpos - starting_press_x) == 0 && (ypos - starting_press_y) > 0){
 					models[cur_idx].rotation.x += 1.0f;
-				else if ((xpos - starting_press_x) == 0 && (ypos - starting_press_y) < 0)
+				} else if ((xpos - starting_press_x) == 0 && (ypos - starting_press_y) < 0){
 					models[cur_idx].rotation.x -= 1.0f;
-				else if ((xpos - starting_press_x) < 0 && (ypos - starting_press_y) > 0) {
+				} else if ((xpos - starting_press_x) < 0 && (ypos - starting_press_y) > 0) {
 					models[cur_idx].rotation.y -= 1.0f;
 					models[cur_idx].rotation.x += 1.0f;
-				}
-				else if ((xpos - starting_press_x) < 0 && (ypos - starting_press_y) == 0)
+				} else if ((xpos - starting_press_x) < 0 && (ypos - starting_press_y) == 0){
 					models[cur_idx].rotation.y -= 1.0f;
-				else if ((xpos - starting_press_x) < 0 && (ypos - starting_press_y) < 0) {
+				} else if ((xpos - starting_press_x) < 0 && (ypos - starting_press_y) < 0) {
 					models[cur_idx].rotation.y -= 1.0f;
 					models[cur_idx].rotation.x -= 1.0f;
 				}
 				starting_press_x = xpos;
 				starting_press_y = ypos;
-			}
-			else if (cur_trans_mode == GeoScaling) { // scale mode			
-				// if cursor shift right, then object will be thinner. // followed by demo.
-				// if cursor shift left, then object will be fatter. // followed by demo.
-				// if cursor shiht up, then object will be higher.
-				// if cursor shit down, then object will be shorter.
-
+			} else if (cur_trans_mode == GeoScaling) { // scale mode			
+				/* if cursor shift right, then object will be thinner. // followed by demo.
+				   if cursor shift left, then object will be fatter. // followed by demo.
+				 if cursor shiht up, then object will be higher.
+				 if cursor shit down, then object will be shorter.
+				*/
 				if ((xpos - starting_press_x) > 0 && (ypos - starting_press_y) > 0) {
 					models[cur_idx].scale.x -= 0.02f;
 					models[cur_idx].scale.y += 0.02f;
-				}
-				else if ((xpos - starting_press_x) > 0 && (ypos - starting_press_y) == 0)
+				} else if ((xpos - starting_press_x) > 0 && (ypos - starting_press_y) == 0){
 					models[cur_idx].scale.x -= 0.02f;
-				else if ((xpos - starting_press_x) > 0 && (ypos - starting_press_y) < 0) {
+				} else if ((xpos - starting_press_x) > 0 && (ypos - starting_press_y) < 0) {
 					models[cur_idx].scale.x -= 0.02f;
 					models[cur_idx].scale.y += 0.02f;
-				}
-				else if ((xpos - starting_press_x) == 0 && (ypos - starting_press_y) > 0)
+				} else if ((xpos - starting_press_x) == 0 && (ypos - starting_press_y) > 0){
 					models[cur_idx].scale.y -= 0.02f;
-				else if ((xpos - starting_press_x) == 0 && (ypos - starting_press_y) < 0)
+				} else if ((xpos - starting_press_x) == 0 && (ypos - starting_press_y) < 0) {
 					models[cur_idx].scale.y += 0.02f;
-				else if ((xpos - starting_press_x) < 0 && (ypos - starting_press_y) > 0) {
+				} else if ((xpos - starting_press_x) < 0 && (ypos - starting_press_y) > 0) {
 					models[cur_idx].scale.x += 0.02f;
 					models[cur_idx].scale.y -= 0.02f;
-				}
-				else if ((xpos - starting_press_x) < 0 && (ypos - starting_press_y) == 0)
+				} else if ((xpos - starting_press_x) < 0 && (ypos - starting_press_y) == 0) { 
 					models[cur_idx].scale.x += 0.02f;
-				else if ((xpos - starting_press_x) < 0 && (ypos - starting_press_y) < 0) {
+				} else if ((xpos - starting_press_x) < 0 && (ypos - starting_press_y) < 0) {
 					models[cur_idx].scale.x += 0.02f;
 					models[cur_idx].scale.y += 0.02f;
 				}
 				starting_press_x = xpos;
 				starting_press_y = ypos;
-			}
-			else if (cur_trans_mode == Light_editing_mode) {
+			} else if (cur_trans_mode == Light_editing_mode) {
 				if (cur_light_mode == Directional_light_mode) {
 					if ((xpos - starting_press_x) > 0 && (ypos - starting_press_y) > 0) {
 						Directional_light.position.x += 0.02f;
 						Directional_light.position.y += 0.02f;
-					}
-					else if ((xpos - starting_press_x) > 0 && (ypos - starting_press_y) == 0)
+					} else if ((xpos - starting_press_x) > 0 && (ypos - starting_press_y) == 0){
 						Directional_light.position.x += 0.02f;
-					else if ((xpos - starting_press_x) > 0 && (ypos - starting_press_y) < 0) {
+					} else if ((xpos - starting_press_x) > 0 && (ypos - starting_press_y) < 0) {
 						Directional_light.position.x += 0.02f;
 						Directional_light.position.y += 0.02f;
-					}
-					else if ((xpos - starting_press_x) == 0 && (ypos - starting_press_y) > 0)
+					} else if ((xpos - starting_press_x) == 0 && (ypos - starting_press_y) > 0) {
 						Directional_light.position.y -= 0.02f;
-					else if ((xpos - starting_press_x) == 0 && (ypos - starting_press_y) < 0)
+					} else if ((xpos - starting_press_x) == 0 && (ypos - starting_press_y) < 0) {
 						Directional_light.position.y += 0.02f;
-					else if ((xpos - starting_press_x) < 0 && (ypos - starting_press_y) > 0) {
+					} else if ((xpos - starting_press_x) < 0 && (ypos - starting_press_y) > 0) {
 						Directional_light.position.x -= 0.02f;
 						Directional_light.position.y -= 0.02f;
-					}
-					else if ((xpos - starting_press_x) < 0 && (ypos - starting_press_y) == 0)
+					} else if ((xpos - starting_press_x) < 0 && (ypos - starting_press_y) == 0){
 						Directional_light.position.x -= 0.02f;
-					else if ((xpos - starting_press_x) < 0 && (ypos - starting_press_y) < 0) {
+					} else if ((xpos - starting_press_x) < 0 && (ypos - starting_press_y) < 0) {
 						Directional_light.position.x -= 0.02f;
 						Directional_light.position.y += 0.02f;
 					}
 					starting_press_x = xpos;
 					starting_press_y = ypos;
 					std::cout << "directional light position = ( " << Directional_light.position.x << ", " << Directional_light.position.y << ", " << Directional_light.position.z << " )" << std::endl;
-				}
-				else if (cur_light_mode == Point_light_mode) {
+				} else if (cur_light_mode == Point_light_mode) {
 					if ((xpos - starting_press_x) > 0 && (ypos - starting_press_y) > 0) {
 						Point_light.position.x += 0.02f;
 						Point_light.position.y += 0.02f;
 					}
-					else if ((xpos - starting_press_x) > 0 && (ypos - starting_press_y) == 0)
+					else if ((xpos - starting_press_x) > 0 && (ypos - starting_press_y) == 0) {
 						Point_light.position.x += 0.02f;
-					else if ((xpos - starting_press_x) > 0 && (ypos - starting_press_y) < 0) {
+					} else if ((xpos - starting_press_x) > 0 && (ypos - starting_press_y) < 0) {
 						Point_light.position.x += 0.02f;
 						Point_light.position.y += 0.02f;
-					}
-					else if ((xpos - starting_press_x) == 0 && (ypos - starting_press_y) > 0)
+					} else if ((xpos - starting_press_x) == 0 && (ypos - starting_press_y) > 0) {
 						Point_light.position.y -= 0.02f;
-					else if ((xpos - starting_press_x) == 0 && (ypos - starting_press_y) < 0)
+					} else if ((xpos - starting_press_x) == 0 && (ypos - starting_press_y) < 0) {
 						Point_light.position.y += 0.02f;
-					else if ((xpos - starting_press_x) < 0 && (ypos - starting_press_y) > 0) {
+					} else if ((xpos - starting_press_x) < 0 && (ypos - starting_press_y) > 0) {
 						Point_light.position.x -= 0.02f;
 						Point_light.position.y -= 0.02f;
-					}
-					else if ((xpos - starting_press_x) < 0 && (ypos - starting_press_y) == 0)
+					} else if ((xpos - starting_press_x) < 0 && (ypos - starting_press_y) == 0) {
 						Point_light.position.x -= 0.02f;
-					else if ((xpos - starting_press_x) < 0 && (ypos - starting_press_y) < 0) {
+					} else if ((xpos - starting_press_x) < 0 && (ypos - starting_press_y) < 0) {
 						Point_light.position.x -= 0.02f;
 						Point_light.position.y += 0.02f;
 					}
 					starting_press_x = xpos;
 					starting_press_y = ypos;
 					std::cout << "point light position = ( " << Point_light.position.x << ", " << Point_light.position.y << ", " << Point_light.position.z << " )" << std::endl;
-				}
-				else if (cur_light_mode == Spot_light_mode){
+				} else if (cur_light_mode == Spot_light_mode){
 					if ((xpos - starting_press_x) > 0 && (ypos - starting_press_y) > 0) {
 						Spot_light.position.x += 0.02f;
 						Spot_light.position.y += 0.02f;
-					}
-					else if ((xpos - starting_press_x) > 0 && (ypos - starting_press_y) == 0)
+					} else if ((xpos - starting_press_x) > 0 && (ypos - starting_press_y) == 0) {
 						Point_light.position.x += 0.02f;
-					else if ((xpos - starting_press_x) > 0 && (ypos - starting_press_y) < 0) {
+					} else if ((xpos - starting_press_x) > 0 && (ypos - starting_press_y) < 0) {
 						Spot_light.position.x += 0.02f;
 						Spot_light.position.y += 0.02f;
-					}
-					else if ((xpos - starting_press_x) == 0 && (ypos - starting_press_y) > 0)
+					} else if ((xpos - starting_press_x) == 0 && (ypos - starting_press_y) > 0) {
 						Spot_light.position.y -= 0.02f;
-					else if ((xpos - starting_press_x) == 0 && (ypos - starting_press_y) < 0)
+					} else if ((xpos - starting_press_x) == 0 && (ypos - starting_press_y) < 0) {
 						Spot_light.position.y += 0.02f;
-					else if ((xpos - starting_press_x) < 0 && (ypos - starting_press_y) > 0) {
+					} else if ((xpos - starting_press_x) < 0 && (ypos - starting_press_y) > 0) {
 						Spot_light.position.x -= 0.02f;
 						Spot_light.position.y -= 0.02f;
-					}
-					else if ((xpos - starting_press_x) < 0 && (ypos - starting_press_y) == 0)
+					} else if ((xpos - starting_press_x) < 0 && (ypos - starting_press_y) == 0) {
 						Spot_light.position.x -= 0.02f;
-					else if ((xpos - starting_press_x) < 0 && (ypos - starting_press_y) < 0) {
+					} else if ((xpos - starting_press_x) < 0 && (ypos - starting_press_y) < 0) {
 						Spot_light.position.x -= 0.02f;
 						Spot_light.position.y += 0.02f;
 					}
@@ -818,8 +785,7 @@ void setShaders()
 	glCompileShader(v);
 	// check for shader compile errors
 	glGetShaderiv(v, GL_COMPILE_STATUS, &success);
-	if (!success)
-	{
+	if (!success) {
 		glGetShaderInfoLog(v, 1000, NULL, infoLog);
 		std::cout << "ERROR: VERTEX SHADER COMPILATION FAILED\n" << infoLog << std::endl;
 	}
@@ -828,8 +794,7 @@ void setShaders()
 	glCompileShader(f);
 	// check for shader compile errors
 	glGetShaderiv(f, GL_COMPILE_STATUS, &success);
-	if (!success)
-	{
+	if (!success) {
 		glGetShaderInfoLog(f, 1000, NULL, infoLog);
 		std::cout << "ERROR: FRAGMENT SHADER COMPILATION FAILED\n" << infoLog << std::endl;
 	}
@@ -880,10 +845,9 @@ void setShaders()
 	iLocAttQuadratic = glGetUniformLocation(p, "AttLightQuadratic");
 
 
-	if (success)
+	if (success) {
 		glUseProgram(p);
-    else
-    {
+    } else {
         system("pause");
         exit(123);
     }
@@ -898,48 +862,18 @@ void normalization(tinyobj::attrib_t* attrib, vector<GLfloat>& vertices, vector<
 	for (int i = 0; i < attrib->vertices.size(); i++)
 	{
 		//maxs = max(maxs, attrib->vertices.at(i));
-		if (i % 3 == 0)
-		{
-
+		if (i % 3 == 0) {
 			xVector.push_back(attrib->vertices.at(i));
-
-			if (attrib->vertices.at(i) < minX)
-			{
-				minX = attrib->vertices.at(i);
-			}
-
-			if (attrib->vertices.at(i) > maxX)
-			{
-				maxX = attrib->vertices.at(i);
-			}
-		}
-		else if (i % 3 == 1)
-		{
+			if (attrib->vertices.at(i) < minX) minX = attrib->vertices.at(i);
+			if (attrib->vertices.at(i) > maxX) maxX = attrib->vertices.at(i);
+		} else if (i % 3 == 1) {
 			yVector.push_back(attrib->vertices.at(i));
-
-			if (attrib->vertices.at(i) < minY)
-			{
-				minY = attrib->vertices.at(i);
-			}
-
-			if (attrib->vertices.at(i) > maxY)
-			{
-				maxY = attrib->vertices.at(i);
-			}
-		}
-		else if (i % 3 == 2)
-		{
+			if (attrib->vertices.at(i) < minY) minY = attrib->vertices.at(i);
+			if (attrib->vertices.at(i) > maxY) maxY = attrib->vertices.at(i);
+		} else if (i % 3 == 2) {
 			zVector.push_back(attrib->vertices.at(i));
-
-			if (attrib->vertices.at(i) < minZ)
-			{
-				minZ = attrib->vertices.at(i);
-			}
-
-			if (attrib->vertices.at(i) > maxZ)
-			{
-				maxZ = attrib->vertices.at(i);
-			}
+			if (attrib->vertices.at(i) < minZ) minZ = attrib->vertices.at(i);
+			if (attrib->vertices.at(i) > maxZ) maxZ = attrib->vertices.at(i);
 		}
 	}
 
@@ -947,40 +881,22 @@ void normalization(tinyobj::attrib_t* attrib, vector<GLfloat>& vertices, vector<
 	float offsetY = (maxY + minY) / 2;
 	float offsetZ = (maxZ + minZ) / 2;
 
-	for (int i = 0; i < attrib->vertices.size(); i++)
-	{
-		if (offsetX != 0 && i % 3 == 0)
-		{
-			attrib->vertices.at(i) = attrib->vertices.at(i) - offsetX;
-		}
-		else if (offsetY != 0 && i % 3 == 1)
-		{
-			attrib->vertices.at(i) = attrib->vertices.at(i) - offsetY;
-		}
-		else if (offsetZ != 0 && i % 3 == 2)
-		{
-			attrib->vertices.at(i) = attrib->vertices.at(i) - offsetZ;
-		}
+	for (int i = 0; i < attrib->vertices.size(); i++) {
+		if (offsetX != 0 && i % 3 == 0) attrib->vertices.at(i) = attrib->vertices.at(i) - offsetX;
+		else if (offsetY != 0 && i % 3 == 1) attrib->vertices.at(i) = attrib->vertices.at(i) - offsetY;
+		else if (offsetZ != 0 && i % 3 == 2) attrib->vertices.at(i) = attrib->vertices.at(i) - offsetZ;
 	}
 
 	float greatestAxis = maxX - minX;
 	float distanceOfYAxis = maxY - minY;
 	float distanceOfZAxis = maxZ - minZ;
 
-	if (distanceOfYAxis > greatestAxis)
-	{
-		greatestAxis = distanceOfYAxis;
-	}
-
-	if (distanceOfZAxis > greatestAxis)
-	{
-		greatestAxis = distanceOfZAxis;
-	}
+	if (distanceOfYAxis > greatestAxis) greatestAxis = distanceOfYAxis;
+	if (distanceOfZAxis > greatestAxis) greatestAxis = distanceOfZAxis;
 
 	float scale = greatestAxis / 2;
 
-	for (int i = 0; i < attrib->vertices.size(); i++)
-	{
+	for (int i = 0; i < attrib->vertices.size(); i++) {
 		//std::cout << i << " = " << (double)(attrib.vertices.at(i) / greatestAxis) << std::endl;
 		attrib->vertices.at(i) = attrib->vertices.at(i) / scale;
 	}
@@ -1011,8 +927,9 @@ void normalization(tinyobj::attrib_t* attrib, vector<GLfloat>& vertices, vector<
 }
 
 string GetBaseDir(const string& filepath) {
-	if (filepath.find_last_of("/\\") != std::string::npos)
+	if (filepath.find_last_of("/\\") != std::string::npos){
 		return filepath.substr(0, filepath.find_last_of("/\\"));
+	}
 	return "";
 }
 
@@ -1054,8 +971,7 @@ void LoadModels(string model_path)
 	model tmp_model;
 
 	vector<PhongMaterial> allMaterial;
-	for (int i = 0; i < materials.size(); i++)
-	{
+	for (int i = 0; i < materials.size(); i++) {
 		PhongMaterial material;
 		material.Ka = Vector3(materials[i].ambient[0], materials[i].ambient[1], materials[i].ambient[2]);
 		material.Kd = Vector3(materials[i].diffuse[0], materials[i].diffuse[1], materials[i].diffuse[2]);
@@ -1063,9 +979,7 @@ void LoadModels(string model_path)
 		allMaterial.push_back(material);
 	}
 
-	for (int i = 0; i < shapes.size(); i++)
-	{
-
+	for (int i = 0; i < shapes.size(); i++) {
 		vertices.clear();
 		colors.clear();
 		normals.clear();
@@ -1127,7 +1041,7 @@ void initParameter()
 	Diffuse_intensity = Vector3(1, 1, 1);
 	Ambient_intensity = Vector3(0.15, 0.15, 0.15);
 	Shininess = 64.0f;
-					
+
 	// directional light parameter
 	Directional_light.position = Vector3(1, 1, 1);
 	// point light parameter
@@ -1154,7 +1068,7 @@ void setupRC()
 	// OpenGL States and Values
 	glClearColor(0.2, 0.2, 0.2, 1.0);
 	vector<string> model_list{ "../NormalModels/bunny5KN.obj", "../NormalModels/dragon10KN.obj", "../NormalModels/lucy25KN.obj", "../NormalModels/teapot4KN.obj", "../NormalModels/dolphinN.obj"};
-	
+
 	// [TODO] Load five model at here
 	cout << "[" << cur_idx << "]:" << model_list[cur_idx % 5] << endl;
 	LoadModels(model_list[cur_idx % 5]);
@@ -1174,13 +1088,11 @@ void glPrintContextInfo(bool printExtension)
 	cout << "GL_RENDERER = " << (const char*)glGetString(GL_RENDERER) << endl;
 	cout << "GL_VERSION = " << (const char*)glGetString(GL_VERSION) << endl;
 	cout << "GL_SHADING_LANGUAGE_VERSION = " << (const char*)glGetString(GL_SHADING_LANGUAGE_VERSION) << endl;
-	if (printExtension)
-	{
+	if (printExtension) {
 		GLint numExt;
 		glGetIntegerv(GL_NUM_EXTENSIONS, &numExt);
 		cout << "GL_EXTENSIONS =" << endl;
-		for (GLint i = 0; i < numExt; i++)
-		{
+		for (GLint i = 0; i < numExt; i++){
 			cout << "\t" << (const char*)glGetStringi(GL_EXTENSIONS, i) << endl;
 		}
 	}
@@ -1194,7 +1106,7 @@ int main(int argc, char **argv)
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    
+
 #ifdef __APPLE__
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // fix compilation on OS X
 #endif
@@ -1202,8 +1114,7 @@ int main(int argc, char **argv)
     
     // create window
 	GLFWwindow* window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "109062671 HW2", NULL, NULL);
-    if (window == NULL)
-    {
+    if (window == NULL) {
         std::cout << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
         return -1;
@@ -1212,8 +1123,7 @@ int main(int argc, char **argv)
     
     
     // load OpenGL function pointer
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-    {
+    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
         std::cout << "Failed to initialize GLAD" << std::endl;
         return -1;
     }
@@ -1230,8 +1140,7 @@ int main(int argc, char **argv)
 	setupRC();
 
 	// main loop
-    while (!glfwWindowShouldClose(window))
-    {
+    while (!glfwWindowShouldClose(window)) {
         // render
         RenderScene();
         
