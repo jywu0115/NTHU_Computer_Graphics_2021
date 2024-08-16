@@ -6,11 +6,11 @@
 專案內容
 ---
 
-AS01: Draw some 3D models with Viewing Transformations  
+AS01: Draw 3D models with Viewing Transformations  
 
-AS02: Draw some 3D models with Viewing Transformations Plus Lighting  
+AS02: Draw 3D models with Viewing Transformations Plus Lighting  
 
-AS03: Draw some 3D models with Textures and Lighting
+AS03: Draw 3D models with Textures and Lighting
 
 
 Contribution
