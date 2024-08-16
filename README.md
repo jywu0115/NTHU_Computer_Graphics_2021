@@ -14,4 +14,4 @@ AS03: Draw some 3D models with Textures and Lighting
 Contribution
 ---
 
-完成課程作業內容[TODO](詳情請參考各資料夾內的Assignment PDF)，並附上實驗數據及報告(HW REPORT PDF)
+完成課程作業內容[TODO](詳情請參考各資料夾內的Assignment PDF)，並附上Demo成果及報告(HW REPORT PDF)
